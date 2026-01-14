@@ -839,59 +839,92 @@ async def get_config(device_id: str, device=Depends(get_current_device)):
         }
     }
 
+# In-memory event queue for SSE clients (fallback when Redis is not available)
+sse_clients: list = []
+
 # Server-Sent Events endpoint
 @app.get("/api/events")
 async def sse_endpoint():
     """Server-Sent Events endpoint for real-time updates"""
     async def event_generator():
-        # Send initial connection message
-        yield {
-            "event": "connected",
-            "data": json.dumps({"message": "Connected to SSE stream"})
-        }
+        # Create a queue for this client
+        client_queue = asyncio.Queue()
+        sse_clients.append(client_queue)
         
-        if redis_client:
-            # Subscribe to Redis pub/sub for multi-worker support
-            pubsub = redis_client.pubsub()
-            await pubsub.subscribe("sse_events")
+        try:
+            # Send initial connection message
+            yield {
+                "event": "connected",
+                "data": json.dumps({"message": "Connected to SSE stream"})
+            }
             
-            try:
-                async for message in pubsub.listen():
-                    if message["type"] == "message":
-                        data = message["data"].decode("utf-8") if isinstance(message["data"], bytes) else message["data"]
+            if redis_client:
+                # Subscribe to Redis pub/sub for multi-worker support
+                pubsub = redis_client.pubsub()
+                await pubsub.subscribe("sse_events")
+                
+                try:
+                    async for message in pubsub.listen():
+                        if message["type"] == "message":
+                            data = message["data"].decode("utf-8") if isinstance(message["data"], bytes) else message["data"]
+                            yield {
+                                "event": "message",
+                                "data": data
+                            }
+                except asyncio.CancelledError:
+                    await pubsub.unsubscribe("sse_events")
+                    await pubsub.close()
+                    raise
+            else:
+                # Fallback: Use in-memory queue for this client
+                logger.info(f"SSE client connected via in-memory queue (total clients: {len(sse_clients)})")
+                while True:
+                    try:
+                        # Wait for events with timeout for periodic pings
+                        message = await asyncio.wait_for(client_queue.get(), timeout=30.0)
                         yield {
                             "event": "message",
-                            "data": data
+                            "data": message
                         }
-            except asyncio.CancelledError:
-                await pubsub.unsubscribe("sse_events")
-                await pubsub.close()
-                raise
-        else:
-            # Fallback: Keep connection alive with periodic pings
-            while True:
-                await asyncio.sleep(30)
-                yield {
-                    "event": "ping",
-                    "data": json.dumps({"timestamp": datetime.utcnow().isoformat()})
-                }
+                    except asyncio.TimeoutError:
+                        # Send ping to keep connection alive
+                        yield {
+                            "event": "ping",
+                            "data": json.dumps({"timestamp": datetime.utcnow().isoformat()})
+                        }
+        finally:
+            # Clean up this client's queue when connection closes
+            if client_queue in sse_clients:
+                sse_clients.remove(client_queue)
+                logger.info(f"SSE client disconnected (remaining clients: {len(sse_clients)})")
     
     return EventSourceResponse(event_generator())
 
-# Helper function to broadcast events via Redis
+# Helper function to broadcast events via Redis or in-memory queue
 async def broadcast_event(event_type: str, data: dict):
-    """Broadcast event to all SSE clients via Redis"""
+    """Broadcast event to all SSE clients via Redis or in-memory queue"""
+    message = json.dumps({
+        "type": event_type,
+        "data": data,
+        "timestamp": datetime.utcnow().isoformat()
+    })
+    
     if redis_client:
         try:
-            # Quick check if client might be connected
-            message = json.dumps({
-                "type": event_type,
-                "data": data,
-                "timestamp": datetime.utcnow().isoformat()
-            })
+            # Use Redis for multi-worker support
             await redis_client.publish("sse_events", message)
         except Exception as e:
             # Downgrade to warning to reduce noise if Redis isn't running
             logger.warning(f"Could not broadcast via Redis (likely down): {e}")
     else:
-        logger.debug(f"Redis not available, skip broadcast: {event_type}")
+        # Fallback: Use in-memory queue for all connected clients
+        if sse_clients:
+            logger.info(f"📢 Broadcasting {event_type} to {len(sse_clients)} SSE clients via in-memory queue")
+            for client_queue in sse_clients:
+                try:
+                    # Non-blocking put to avoid slowing down the application
+                    client_queue.put_nowait(message)
+                except asyncio.QueueFull:
+                    logger.warning("SSE client queue full, dropping message")
+        else:
+            logger.debug(f"No SSE clients connected, skip broadcast: {event_type}")
