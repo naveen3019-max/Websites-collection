@@ -202,7 +202,7 @@ export default function EnhancedDashboard() {
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Hotel Tablet Security</h1>
             <p className="text-gray-600">
-              {devices.length} devices • {alerts.filter((a) => !a.acknowledged).length} unacknowledged alerts
+              {devices.length} devices • {alerts.filter((a) => a && !a.acknowledged).length} unacknowledged alerts
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -238,7 +238,12 @@ export default function EnhancedDashboard() {
         <section>
           <h2 className="text-xl font-semibold mb-4">Fleet Status</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredDevices.map((d) => (
+            {filteredDevices.length === 0 && !isLoading && (
+              <div className="col-span-full text-center py-8 text-gray-500">
+                No devices found. Register a device using the Android app.
+              </div>
+            )}
+            {filteredDevices.filter(d => d && d.deviceId).map((d) => (
               <div
                 key={d.deviceId}
                 className="bg-white rounded-lg shadow-md p-5 hover:shadow-lg transition-shadow"
@@ -294,7 +299,12 @@ export default function EnhancedDashboard() {
           <h2 className="text-xl font-semibold mb-4">Recent Alerts</h2>
           <div className="bg-white rounded-lg shadow overflow-hidden">
             <div className="max-h-96 overflow-y-auto">
-              {alerts.map((a, i) => (
+              {alerts.length === 0 && !isLoading && (
+                <div className="text-center py-8 text-gray-500">
+                  No alerts yet. Breaches will appear here.
+                </div>
+              )}
+              {alerts.filter(a => a && a.type).map((a, i) => (
                 <div
                   key={i}
                   className={`border-b p-4 hover:bg-gray-50 cursor-pointer ${
