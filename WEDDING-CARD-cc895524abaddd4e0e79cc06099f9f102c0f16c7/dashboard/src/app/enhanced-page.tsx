@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "";
+const API = process.env.NEXT_PUBLIC_API_URL || "https://hotel-backend-zqc1.onrender.com";
 
 type Device = {
   deviceId: string;
@@ -28,9 +28,17 @@ export default function EnhancedDashboard() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
   const [eventSource, setEventSource] = useState<EventSource | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Initialize SSE connection for real-time updates
   useEffect(() => {
+    if (!API) {
+      setError("API URL not configured");
+      setIsLoading(false);
+      return;
+    }
+    
     // Try SSE, fallback to polling
     try {
       const es = new EventSource(`${API}/api/events`);
@@ -73,9 +81,13 @@ export default function EnhancedDashboard() {
   // Polling fallback
   useEffect(() => {
     if (eventSource) return; // SSE active, skip polling
+    if (!API) return; // No API configured
     
     const tick = async () => {
       try {
+        setIsLoading(true);
+        setError(null);
+        
         const [devicesRes, alertsRes] = await Promise.all([
           fetch(`${API}/api/devices`),
           fetch(`${API}/api/alerts/recent?limit=100`)
@@ -83,6 +95,8 @@ export default function EnhancedDashboard() {
         
         if (!devicesRes.ok || !alertsRes.ok) {
           console.error("API request failed", devicesRes.status, alertsRes.status);
+          setError(`API Error: ${devicesRes.status} / ${alertsRes.status}`);
+          setIsLoading(false);
           return;
         }
         
@@ -95,8 +109,12 @@ export default function EnhancedDashboard() {
         
         setDevices(validDevices);
         setAlerts(validAlerts.reverse());
+        setIsLoading(false);
+        setError(null);
       } catch (e) {
         console.error("Failed to fetch data", e);
+        setError(e instanceof Error ? e.message : "Failed to fetch data");
+        setIsLoading(false);
       }
     };
     
@@ -159,6 +177,26 @@ export default function EnhancedDashboard() {
   return (
     <main className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
+        {/* Error Display */}
+        {error && (
+          <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4">
+            <div className="flex items-center gap-2">
+              <span className="text-red-600 font-semibold">⚠️ Error:</span>
+              <span className="text-red-700">{error}</span>
+            </div>
+            <div className="mt-2 text-sm text-red-600">
+              <p>Backend URL: {API || "Not configured"}</p>
+            </div>
+          </div>
+        )}
+        
+        {/* Loading Display */}
+        {isLoading && devices.length === 0 && (
+          <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 text-center">
+            <div className="text-blue-600 font-semibold">🔄 Loading dashboard...</div>
+          </div>
+        )}
+        
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
