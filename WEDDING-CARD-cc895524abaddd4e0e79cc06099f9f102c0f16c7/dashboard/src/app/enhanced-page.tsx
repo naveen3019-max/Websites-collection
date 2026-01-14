@@ -36,19 +36,23 @@ export default function EnhancedDashboard() {
       const es = new EventSource(`${API}/api/events`);
       
       es.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        if (data.type === "device_update") {
-          setDevices((prev) => {
-            const idx = prev.findIndex((d) => d.deviceId === data.device.deviceId);
-            if (idx >= 0) {
-              const updated = [...prev];
-              updated[idx] = data.device;
-              return updated;
-            }
-            return [...prev, data.device];
-          });
-        } else if (data.type === "alert") {
-          setAlerts((prev) => [data.alert, ...prev].slice(0, 100));
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === "device_update" && data.device && data.device.deviceId) {
+            setDevices((prev) => {
+              const idx = prev.findIndex((d) => d && d.deviceId === data.device.deviceId);
+              if (idx >= 0) {
+                const updated = [...prev];
+                updated[idx] = data.device;
+                return updated;
+              }
+              return [...prev, data.device];
+            });
+          } else if (data.type === "alert" && data.alert) {
+            setAlerts((prev) => [data.alert, ...prev].slice(0, 100));
+          }
+        } catch (err) {
+          console.error("Error parsing SSE message", err);
         }
       };
       
@@ -77,11 +81,20 @@ export default function EnhancedDashboard() {
           fetch(`${API}/api/alerts/recent?limit=100`)
         ]);
         
+        if (!devicesRes.ok || !alertsRes.ok) {
+          console.error("API request failed", devicesRes.status, alertsRes.status);
+          return;
+        }
+        
         const d = await devicesRes.json();
         const a = await alertsRes.json();
         
-        setDevices(d);
-        setAlerts(a.reverse());
+        // Ensure d is an array and filter out any undefined/null values
+        const validDevices = Array.isArray(d) ? d.filter(device => device && device.deviceId) : [];
+        const validAlerts = Array.isArray(a) ? a.filter(alert => alert) : [];
+        
+        setDevices(validDevices);
+        setAlerts(validAlerts.reverse());
       } catch (e) {
         console.error("Failed to fetch data", e);
       }
@@ -93,6 +106,7 @@ export default function EnhancedDashboard() {
   }, [eventSource]);
 
   const filteredDevices = devices.filter((d) => {
+    if (!d || !d.deviceId) return false; // Safety check
     if (filter !== "all" && d.status !== filter) return false;
     if (searchQuery && !d.deviceId.toLowerCase().includes(searchQuery.toLowerCase()) 
         && !d.roomId?.toLowerCase().includes(searchQuery.toLowerCase())) return false;
