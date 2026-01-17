@@ -65,131 +65,21 @@ class KioskService : Service() {
         if (!isRunning) {
             isRunning = true
             
-            // ALWAYS start WiFi PIN protection first, regardless of provisioning
-            startWifiPinProtection()
+            // WiFi PIN protection disabled
+            // startWifiPinProtection()
             
-            // Then start other monitoring (requires provisioning)
+            // Start monitoring (requires provisioning)
             startMonitoring()
         }
         return START_STICKY
     }
     
     /**
-     * Start WiFi PIN Protection - works even without provisioning
+     * WiFi PIN Protection - DISABLED
      */
     private fun startWifiPinProtection() {
-        val prefs = getSharedPreferences("agent", Context.MODE_PRIVATE)
-        
-        // Clear any stuck flags from previous sessions
-        prefs.edit()
-            .putBoolean("wifi_pin_dialog_active", false)
-            .putBoolean("wifi_disable_authorized", false)
-            .apply()
-        Log.i("KioskService", "✅ Cleared stuck WiFi protection flags")
-        
-        /* ---------------- WIFI PIN PROTECTION (CONTINUOUS MONITORING) ---------------- */
-        // Use BroadcastReceiver as PRIMARY mechanism to revert WiFi OFF immediately
-        Log.e("KioskService", "")
-        Log.e("KioskService", "═══════════════════════════════════════")
-        Log.e("KioskService", "🔐 WiFi PIN Protection - INITIALIZING...")
-        Log.e("KioskService", "   Default PIN: 1234")
-        Log.e("KioskService", "   Primary: BroadcastReceiver (instant revert)")
-        Log.e("KioskService", "   Backup: Monitoring loop (100ms checks)")
-        
-        serviceScope.launch {
-            val wifiManager = getSystemService(Context.WIFI_SERVICE) as WifiManager
-            var lastWifiState = wifiManager.isWifiEnabled
-            var checkCount = 0
-            
-            Log.i("KioskService", "🔄 WiFi monitoring loop STARTED - Initial WiFi state: ${if (lastWifiState) "ON" else "OFF"}")
-            
-            while (isRunning) {
-                try {
-                    val currentWifiState = wifiManager.isWifiEnabled
-                    checkCount++
-                    
-                    // Log status every 300 checks (30 seconds at 100ms)
-                    if (checkCount % 300 == 0) {
-                        Log.i("KioskService", "💓 WiFi Monitor Alive - Checks: $checkCount, WiFi: ${if (currentWifiState) "ON" else "OFF"}")
-                    }
-                    
-                    // Check if PIN dialog is active - if so, continuously force WiFi ON
-                    val pinDialogActive = prefs.getBoolean("wifi_pin_dialog_active", false)
-                    if (pinDialogActive && !currentWifiState) {
-                        Log.e("KioskService", "🔐 PIN dialog active and WiFi OFF - forcing WiFi ON!")
-                        try {
-                            @Suppress("DEPRECATION")
-                            wifiManager.isWifiEnabled = true
-                            // Try multiple times to ensure it turns ON
-                            delay(100)
-                            @Suppress("DEPRECATION")
-                            wifiManager.isWifiEnabled = true
-                            delay(100)
-                            @Suppress("DEPRECATION")
-                            wifiManager.isWifiEnabled = true
-                            Log.e("KioskService", "✅ WiFi forced back ON while dialog active (multiple attempts)")
-                        } catch (e: Exception) {
-                            Log.e("KioskService", "Failed to force WiFi ON: ${e.message}")
-                        }
-                        // Don't update lastWifiState - keep trying to turn ON
-                        delay(300)
-                        continue
-                    }
-                    
-                    // Check if WiFi just turned OFF
-                    if (lastWifiState && !currentWifiState) {
-                        Log.e("KioskService", "🚨🚨🚨 WiFi TURNED OFF DETECTED!")
-                        
-                        // Check if authorized
-                        val authorized = prefs.getBoolean("wifi_disable_authorized", false)
-                        
-                        if (!authorized) {
-                            Log.e("KioskService", "❌ UNAUTHORIZED - Re-enabling WiFi IMMEDIATELY!")
-                            
-                            // Set flag to prevent WifiFence from triggering during PIN dialog
-                            prefs.edit().putBoolean("wifi_pin_dialog_active", true).apply()
-                            
-                            // Turn WiFi back ON immediately - ULTRA AGGRESSIVE (5 rapid attempts)
-                            for (i in 1..5) {
-                                @Suppress("DEPRECATION")
-                                wifiManager.isWifiEnabled = true
-                            }
-                            Log.e("KioskService", "✅ WiFi turned back ON (ultra-aggressive)")
-                            
-                            // Show PIN dialog with minimal delay
-                            Handler(Looper.getMainLooper()).postDelayed({
-                                try {
-                                    val pinIntent = Intent(applicationContext, com.example.hotel.ui.WifiPinDialog::class.java)
-                                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                    startActivity(pinIntent)
-                                    Log.e("KioskService", "📱 PIN dialog launched")
-                                } catch (e: Exception) {
-                                    Log.e("KioskService", "Failed to launch PIN dialog: ${e.message}")
-                                }
-                            }, 200)  // Reduced delay for faster response
-                        } else {
-                            Log.e("KioskService", "✅ WiFi disable was AUTHORIZED by PIN")
-                            prefs.edit().putBoolean("wifi_disable_authorized", false).apply()
-                        }
-                    }
-                    
-                    lastWifiState = currentWifiState
-                    
-                } catch (e: Exception) {
-                    Log.e("KioskService", "WiFi monitor error: ${e.message}")
-                }
-                
-                // Check every 100ms for ULTRA-FAST detection
-                delay(100)
-            }
-        }
-        
-        Log.e("KioskService", "✅ WiFi PIN Protection Monitor RUNNING!")
-        Log.e("KioskService", "   ✓ Monitoring loop active")
-        Log.e("KioskService", "   ✓ Will detect WiFi OFF in < 0.1s")
-        Log.e("KioskService", "   ✓ Will show PIN dialog immediately")
-        Log.e("KioskService", "═══════════════════════════════════════")
-        Log.e("KioskService", "")
+        // WiFi PIN protection has been disabled
+        Log.i("KioskService", "ℹ️ WiFi PIN Protection is DISABLED")
     }
 
     private fun startMonitoring() {
@@ -300,13 +190,8 @@ class KioskService : Service() {
                     }
                 }
 
-                val lockIntent =
-                    Intent(this, com.example.hotel.ui.LockActivity::class.java)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-
-                Log.e("KioskService", "🔒 Launching LockActivity (Orange Breach Screen)...")
-                startActivity(lockIntent)
-                Log.e("KioskService", "✅ LockActivity launched successfully")
+                // Orange breach screen disabled - only send backend alert
+                Log.i("KioskService", "ℹ️ Breach alert sent to backend (orange screen disabled)")
             }, 2000) // Wait 2 seconds to allow WiFi reconnection
             },
             onRecovery = {
