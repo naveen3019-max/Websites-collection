@@ -15,7 +15,9 @@ type Device = {
 
 type Alert = {
   type: string;
-  payload: any;
+  deviceId?: string;
+  roomId?: string;
+  payload?: any;
   ts: string;
   acknowledged?: boolean;
   notes?: string;
@@ -133,7 +135,8 @@ export default function EnhancedDashboard() {
 
   const acknowledgeAlert = async (alert: Alert) => {
     try {
-      if (!alert.payload?.deviceId) {
+      const deviceId = alert.deviceId || alert.payload?.deviceId;
+      if (!deviceId) {
         console.error("Alert missing deviceId", alert);
         return;
       }
@@ -142,7 +145,7 @@ export default function EnhancedDashboard() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          device_id: alert.payload.deviceId,
+          device_id: deviceId,
           timestamp: alert.ts,
           notes: "Acknowledged from dashboard"
         })
@@ -330,7 +333,7 @@ export default function EnhancedDashboard() {
                           {a.type}
                         </span>
                         <span className="text-sm font-medium">
-                          {a.payload?.deviceId || 'Unknown'} • Room {a.payload?.roomId || 'Unknown'}
+                          {a.deviceId || a.payload?.deviceId || 'Unknown'} • Room {a.roomId || a.payload?.roomId || 'Unknown'}
                         </span>
                         {a.acknowledged && (
                           <span className="text-xs text-green-600">✓ Acknowledged</span>
