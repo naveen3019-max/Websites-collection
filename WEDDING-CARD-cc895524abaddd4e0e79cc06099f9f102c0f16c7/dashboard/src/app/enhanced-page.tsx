@@ -3,6 +3,21 @@ import { useEffect, useState } from "react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "https://hotel-backend-zqc1.onrender.com";
 
+// Format timestamp to Indian Standard Time
+const formatISTTime = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleString('en-IN', {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  });
+};
+
 type Device = {
   deviceId: string;
   roomId?: string;
@@ -288,7 +303,7 @@ export default function EnhancedDashboard() {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Last Seen:</span>
                     <span className="text-xs">
-                      {d.lastSeen ? new Date(d.lastSeen).toLocaleString() : "—"}
+                      {d.lastSeen ? formatISTTime(d.lastSeen) : "—"}
                     </span>
                   </div>
                 </div>
@@ -345,7 +360,7 @@ export default function EnhancedDashboard() {
                     </div>
                     <div className="text-right ml-4">
                       <div className="text-xs text-gray-500">
-                        {new Date(a.ts).toLocaleString()}
+                        {formatISTTime(a.ts)}
                       </div>
                       {!a.acknowledged && (
                         <button
