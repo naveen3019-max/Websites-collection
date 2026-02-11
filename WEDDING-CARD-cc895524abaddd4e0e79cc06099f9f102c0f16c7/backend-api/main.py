@@ -96,8 +96,8 @@ async def monitor_device_heartbeats():
                     
                 offline_seconds = (current_time - last_seen).total_seconds()
                 
-                # If device hasn't been seen in 12 seconds, trigger breach
-                if offline_seconds >= 12:
+                # If device hasn't been seen in 20 seconds, trigger breach (heartbeat is every 4s, so 5 missed heartbeats)
+                if offline_seconds >= 20:
                     device_id = device["_id"]
                     room_id = device.get("roomId", "UNKNOWN")
                     
@@ -596,7 +596,7 @@ async def heartbeat(h: Heartbeat, device=Depends(get_current_device)):
                 "message": "Device WiFi connection restored"
             })
         
-        # If device is OK or offline, check for new breach
+        # ONLY check for new breaches if device is OK or offline AND room has configuration
         elif existing_status in [StatusEnum.ok, StatusEnum.offline]:
             # 1. BSSID Mismatch check (case-insensitive)
             if target_bssid and h.wifiBssid.lower() != target_bssid.lower():
@@ -605,7 +605,7 @@ async def heartbeat(h: Heartbeat, device=Depends(get_current_device)):
                 
             # 2. RSSI Breach check (if BSSID matches or target is not set)
             elif h.rssi < min_rssi:
-                logger.warning(f"🚨 Proactive Breach Detected (RSSI): Device {h.deviceId} reported {h.rssi}, threshold {min_rssi}")
+                logger.warning(f"🚨 Proactive Breach Detected (RSSI): Device {h.deviceId} reported {h.rssi} dBm, threshold {min_rssi} dBm")
                 new_status = StatusEnum.breach
 
             if new_status == StatusEnum.breach:
