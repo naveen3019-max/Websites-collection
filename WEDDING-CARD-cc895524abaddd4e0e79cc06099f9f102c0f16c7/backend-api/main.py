@@ -385,6 +385,7 @@ async def alert_breach(b: Breach, device=Depends(get_current_device)):
     }
     
     result = await alerts_collection.insert_one(alert_data)
+    logger.info(f"✅ STORED ALERT: deviceId={b.deviceId}, roomId={b.roomId}, _id={result.inserted_id}")
     
     # Broadcast via Redis for SSE
     await broadcast_event("device_update", {
@@ -653,7 +654,8 @@ async def heartbeat(h: Heartbeat, device=Depends(get_current_device)):
             })
 
     update_data = {
-        "room_id": h.roomId,
+        "roomId": h.roomId,  # Use camelCase to match monitor_device_heartbeats
+        "room_id": h.roomId,  # Keep snake_case for backward compatibility
         "status": new_status,
         "rssi": h.rssi,
         "bssid": h.wifiBssid,
@@ -722,12 +724,15 @@ async def recent_alerts(limit: int = 100, hotel_id: Optional[str] = None):
     ).sort("ts", -1).limit(limit)
     alerts = await cursor.to_list(length=limit)
     
+    logger.info(f"📋 FETCHING {len(alerts)} ALERTS for dashboard")
+    
     # Convert ObjectId to string and normalize field names
     for alert in alerts:
         alert["id"] = str(alert.pop("_id"))
         # Support both camelCase and snake_case for backward compatibility
         alert["deviceId"] = alert.get("deviceId") or alert.get("device_id", "Unknown")
         alert["roomId"] = alert.get("roomId") or alert.get("room_id", "Unknown")
+        logger.info(f"  Alert {alert['id'][:8]}: deviceId={alert['deviceId']}, roomId={alert['roomId']}, type={alert.get('type')}")
         if alert.get("ts"):
             alert["ts"] = alert["ts"].isoformat()
         if alert.get("acknowledged_at"):
