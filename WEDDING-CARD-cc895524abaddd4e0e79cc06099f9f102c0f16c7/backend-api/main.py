@@ -638,10 +638,10 @@ async def list_devices(hotel_id: Optional[str] = None):
     if hotel_id:
         query["hotel_id"] = hotel_id
     
-    # Optimized with projection
+    # Optimized with projection - include both camelCase and snake_case fields
     cursor = devices_collection.find(
         query,
-        projection={"room_id": 1, "hotel_id": 1, "status": 1, "battery": 1, "rssi": 1, "ip": 1, "last_seen": 1}
+        projection={"room_id": 1, "roomId": 1, "hotel_id": 1, "status": 1, "battery": 1, "rssi": 1, "ip": 1, "last_seen": 1}
     )
     devices = await cursor.to_list(length=1000)
     
@@ -649,7 +649,7 @@ async def list_devices(hotel_id: Optional[str] = None):
     return [{
         "id": d["_id"],
         "deviceId": d["_id"],
-        "roomId": d.get("room_id"),
+        "roomId": d.get("roomId") or d.get("room_id"),  # Check both field names
         "hotelId": d.get("hotel_id"),
         "status": d.get("status"),
         "battery": d.get("battery"),
