@@ -52,7 +52,7 @@ class WifiFence(
     private var wifiReconnectingTime: Long = 0  // Time when WiFi started reconnecting
     private val reconnectGracePeriodMs = 10000L  // 10 seconds grace period for WiFi to reconnect
     private var lastRecoveryTime: Long = 0  // Time when last recovery occurred
-    private val recoveryCooldownMs = 30000L  // 30 seconds cooldown after recovery before allowing new breaches
+    private val recoveryCooldownMs = 10000L  // 10 seconds cooldown after recovery before allowing new breaches
 
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
@@ -91,12 +91,6 @@ class WifiFence(
                 val currentSsid = info?.ssid?.trim('"')
                 val currentRssi = if (info?.rssi != -127) info?.rssi else null
 
-                Log.i(
-                    "WifiFence",
-                    "📡 Scan: SSID=$currentSsid, BSSID=$currentBssid, RSSI=$currentRssi dBm " +
-                    "(Min: $minRssi dBm, Grace: $graceSeconds s)"
-                )
-
                 // Track current state
                 lastKnownRssi = currentRssi
                 lastKnownBssid = currentBssid
@@ -104,6 +98,12 @@ class WifiFence(
                 
                 // Check if WiFi is currently enabled
                 val isWifiEnabled = wifiManager.isWifiEnabled
+
+                Log.i(
+                    "WifiFence",
+                    "📡 Scan: SSID=$currentSsid, BSSID=$currentBssid, RSSI=$currentRssi dBm " +
+                    "(Min: $minRssi dBm, Grace: $graceSeconds s, WiFi Enabled: $isWifiEnabled)"
+                )
                 
                 Log.v("WifiFence", "🔍 State: WiFi Enabled=$isWifiEnabled, BSSID=$currentBssid, RSSI=$currentRssi, InBreach=$isInBreachState, ReconnectTimer=$wifiReconnectingTime")
                 
@@ -133,10 +133,11 @@ class WifiFence(
                 // ===== SIMPLE BREACH DETECTION - ANY WIFI =====
                 // Only check if WiFi is ON and connected to ANY network
                 when {
-                    // 1️⃣ CRITICAL: WiFi completely OFF
+                    // 1️⃣ CRITICAL: WiFi completely OFF - IMMEDIATE BREACH
                     !isWifiEnabled -> {
-                        Log.e("WifiFence", "🚨 WiFi is DISABLED (turned OFF)")
-                        breachCounter += 3  // Immediate breach
+                        Log.e("WifiFence", "🚨 WiFi is DISABLED (turned OFF) - IMMEDIATE BREACH!")
+                        // Set breach counter high enough to exceed grace period immediately
+                        breachCounter = (graceSeconds * 1000 / scanIntervalMs).toInt() + 1
                         wifiReconnectingTime = 0  // Reset reconnection timer
                     }
 
@@ -240,8 +241,9 @@ class WifiFence(
                     if (!isInBreachState) {
                         Log.e(
                             "WifiFence",
-                            "🚨🚨🚨 WIFI FENCE BREACH! Elapsed: $elapsedSeconds s, Grace: $graceSeconds s"
+                            "🚨🚨🚨 WIFI FENCE BREACH! Elapsed: $elapsedSeconds s, Grace: $graceSeconds s, Counter: $breachCounter"
                         )
+                        Log.e("WifiFence", "🚨 Breach trigger: WiFi Enabled=$isWifiEnabled, BSSID=$currentBssid, RSSI=$currentRssi")
                         isInBreachState = true  // Set flag to prevent repeated breach triggers
                         onBreach(lastKnownRssi)
                         breachCounter = 0
@@ -251,7 +253,7 @@ class WifiFence(
                 } else if (breachCounter > 0) {
                     Log.w(
                         "WifiFence",
-                        "⚠ Breach counter: $breachCounter (~$elapsedSeconds/$graceSeconds s)"
+                        "⚠ Breach counter: $breachCounter (~$elapsedSeconds/$graceSeconds s) - WiFi Enabled: $isWifiEnabled"
                     )
                 }
 
