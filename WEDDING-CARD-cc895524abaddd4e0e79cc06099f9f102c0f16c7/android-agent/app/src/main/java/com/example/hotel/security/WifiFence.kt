@@ -239,6 +239,13 @@ class WifiFence(
 
                 if (elapsedSeconds >= graceSeconds && !isInRecoveryCooldown) {
                     if (!isInBreachState) {
+                        // CRITICAL: Don't trigger breach if screen is locked (WiFi disconnect is normal power-saving behavior)
+                        if (ScreenStateReceiver.getIsScreenLocked()) {
+                            Log.w("WifiFence", "🌙 Screen is LOCKED - WiFi disconnect is normal (power-saving), resetting breach counter")
+                            breachCounter = 0
+                            return
+                        }
+                        
                         Log.e(
                             "WifiFence",
                             "🚨🚨🚨 WIFI FENCE BREACH! Elapsed: $elapsedSeconds s, Grace: $graceSeconds s, Counter: $breachCounter"

@@ -22,6 +22,7 @@ import androidx.core.app.NotificationCompat
 import com.example.hotel.security.BatteryWatcher
 import com.example.hotel.security.WifiFence
 import com.example.hotel.security.WifiStateReceiver
+import com.example.hotel.security.ScreenStateReceiver
 import com.example.hotel.data.AgentRepository
 import com.example.hotel.data.HeartbeatRequest
 import com.example.hotel.data.BreachRequest
@@ -37,6 +38,7 @@ class KioskService : Service() {
     private lateinit var wifiFence: WifiFence
     private lateinit var batteryWatcher: BatteryWatcher
     private var wifiStateReceiver: WifiStateReceiver? = null
+    private var screenStateReceiver: ScreenStateReceiver? = null
     private var breachOverlayView: View? = null
     private var windowManager: WindowManager? = null
 
@@ -167,6 +169,12 @@ class KioskService : Service() {
             Log.e("KioskService", "   Min RSSI: $minRssi dBm")
             Log.e("KioskService", "   Target BSSID: $bssid")
             Log.e("KioskService", "   Target SSID: $ssid")
+            
+            // Check if screen is locked - WiFi disconnects during screen lock are NORMAL
+            if (ScreenStateReceiver.getIsScreenLocked()) {
+                Log.w("KioskService", "🌙 Screen is LOCKED - WiFi disconnect is normal (power-saving), ignoring breach")
+                return@WifiFence
+            }
             
             // Check if WiFi PIN dialog is currently active
             val prefs = getSharedPreferences("agent", Context.MODE_PRIVATE)
@@ -353,6 +361,17 @@ class KioskService : Service() {
         wifiStateReceiver = WifiStateReceiver()
         val wifiFilter = IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION)
         registerReceiver(wifiStateReceiver, wifiFilter)
+        
+        /* ---------------- SCREEN STATE RECEIVER ---------------- */
+        // Register screen lock/unlock detection to prevent false breach alerts
+        screenStateReceiver = ScreenStateReceiver()
+        val screenFilter = IntentFilter().apply {
+            addAction(Intent.ACTION_SCREEN_OFF)
+            addAction(Intent.ACTION_SCREEN_ON)
+            addAction(Intent.ACTION_USER_PRESENT)
+        }
+        registerReceiver(screenStateReceiver, screenFilter)
+        Log.i("KioskService", "✅ Screen state receiver registered - WiFi changes during screen lock will be ignored")
 
         /* ---------------- BATTERY WATCHER ---------------- */
 
@@ -497,6 +516,16 @@ class KioskService : Service() {
                 Log.i("KioskService", "WiFi state receiver unregistered")
             } catch (e: Exception) {
                 Log.e("KioskService", "Failed to unregister WiFi receiver: ${e.message}")
+            }
+        }
+        
+        // Unregister screen state receiver
+        screenStateReceiver?.let {
+            try {
+                unregisterReceiver(it)
+                Log.i("KioskService", "Screen state receiver unregistered")
+            } catch (e: Exception) {
+                Log.e("KioskService", "Failed to unregister screen receiver: ${e.message}")
             }
         }
         
