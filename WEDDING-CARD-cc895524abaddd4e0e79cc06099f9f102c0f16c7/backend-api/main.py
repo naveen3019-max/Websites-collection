@@ -69,12 +69,82 @@ monitoring_task = None
 
 async def monitor_device_heartbeats():
     """Background task to detect devices that stop sending heartbeats (WiFi OFF)"""
-    logger.info("🔍 Heartbeat monitoring task DISABLED to prevent false breach alerts")
-    logger.info("WiFi OFF detection is now handled only by heartbeat endpoint")
+    logger.info("🔍 Starting heartbeat monitoring task for WiFi OFF detection")
     
-    # Task disabled - just sleep forever
+    # Heartbeat timeout: 15 seconds (devices send heartbeats every 4 seconds)
+    HEARTBEAT_TIMEOUT_SECONDS = 15
+    
     while True:
-        await asyncio.sleep(3600)  # Sleep for an hour and do nothing
+        try:
+            # Check every 5 seconds
+            await asyncio.sleep(5)
+            
+            now = get_ist_time()
+            
+            # Find all devices that haven't sent a heartbeat recently
+            timeout_threshold = now.timestamp() - HEARTBEAT_TIMEOUT_SECONDS
+            
+            # Query devices with last_seen older than threshold
+            cursor = devices_collection.find({
+                "last_seen": {"$exists": True},
+                "last_seen": {"$lt": datetime.fromtimestamp(timeout_threshold, tz=pytz.timezone('Asia/Kolkata'))}
+            })
+            
+            async for device in cursor:
+                device_id = device["_id"]
+                current_status = device.get("status", StatusEnum.ok)
+                last_seen = device.get("last_seen")
+                
+                # Only trigger breach for devices that were previously OK or offline
+                if current_status in [StatusEnum.ok, StatusEnum.offline]:
+                    seconds_since_heartbeat = (now - last_seen).total_seconds()
+                    
+                    logger.warning(f"🚨 HEARTBEAT TIMEOUT: Device {device_id} - Last seen {int(seconds_since_heartbeat)}s ago (threshold: {HEARTBEAT_TIMEOUT_SECONDS}s)")
+                    print(f"🚨 HEARTBEAT TIMEOUT: {device_id} - WiFi likely OFF (no heartbeat for {int(seconds_since_heartbeat)}s)", flush=True)
+                    
+                    # Mark device as breach
+                    await devices_collection.update_one(
+                        {"_id": device_id},
+                        {"$set": {"status": StatusEnum.breach}}
+                    )
+                    
+                    # Create breach alert
+                    await alerts_collection.insert_one({
+                        "deviceId": device_id,
+                        "roomId": device.get("roomId", device.get("room_id", "unknown")),
+                        "type": "breach",
+                        "severity": "high",
+                        "message": f"WiFi connection lost - device stopped sending heartbeats (last seen {int(seconds_since_heartbeat)}s ago)",
+                        "rssi": device.get("rssi", -127),
+                        "bssid": device.get("bssid", "unknown"),
+                        "ts": now,
+                        "acknowledged": False,
+                        "source": "heartbeat_timeout"
+                    })
+                    
+                    # Broadcast alert to dashboard
+                    await broadcast_event("alert", {
+                        "type": "breach",
+                        "deviceId": device_id,
+                        "roomId": device.get("roomId", device.get("room_id", "unknown")),
+                        "rssi": device.get("rssi", -127),
+                        "bssid": device.get("bssid", "unknown"),
+                        "source": "heartbeat_timeout",
+                        "message": f"WiFi disconnected - no heartbeat for {int(seconds_since_heartbeat)}s"
+                    })
+                    
+                    # Send mobile notification
+                    asyncio.create_task(
+                        NotificationService.send_breach_alert(
+                            device_id,
+                            device.get("roomId", device.get("room_id", "unknown")),
+                            device.get("rssi", -127)
+                        )
+                    )
+                    
+        except Exception as e:
+            logger.error(f"Error in heartbeat monitoring: {e}")
+            await asyncio.sleep(5)  # Continue monitoring even if error occurs
 
 @app.on_event("startup")
 async def on_startup():
@@ -456,8 +526,8 @@ async def heartbeat(h: Heartbeat, device=Depends(get_current_device)):
     current_device = await devices_collection.find_one({"_id": h.deviceId})
     existing_status = current_device.get("status", StatusEnum.ok) if current_device else StatusEnum.ok
     
-    # NOTE: WiFi OFF detection is handled by monitor_device_heartbeats() background task
-    # We don't double-detect here to avoid duplicate breach alerts
+    # NOTE: WiFi OFF detection (missing heartbeats) is handled by monitor_device_heartbeats() background task
+    # This endpoint focuses on proactive breach detection (BSSID mismatch, weak RSSI) during active heartbeats
     
     # Proactive breach detection: Check BSSID/RSSI against room baseline
     new_status = existing_status
