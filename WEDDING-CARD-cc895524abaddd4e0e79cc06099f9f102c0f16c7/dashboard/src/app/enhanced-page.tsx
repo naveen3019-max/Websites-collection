@@ -6,19 +6,19 @@ const API = process.env.NEXT_PUBLIC_API_URL || "https://hotel-backend-zqc1.onren
 // Format timestamp to Indian Standard Time
 const formatISTTime = (dateString: string): string => {
   try {
-    const date = new Date(dateString);
-    // Format in IST timezone
-    const istString = date.toLocaleString('en-IN', {
-      timeZone: 'Asia/Kolkata',
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: true
-    });
-    return `${istString} IST`;
+    // Backend sends IST timestamps like: 2026-02-13T16:58:10.033921+05:30
+    // Parse the timestamp directly without timezone conversion
+    const match = dateString.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/);
+    if (!match) {
+      return dateString;
+    }
+    
+    const [_, year, month, day, hour24, minute, second] = match;
+    let hour = parseInt(hour24);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    hour = hour % 12 || 12; // Convert to 12-hour format
+    
+    return `${day}/${month}/${year} ${String(hour).padStart(2, '0')}:${minute}:${second} ${ampm} IST`;
   } catch (e) {
     return dateString;
   }
