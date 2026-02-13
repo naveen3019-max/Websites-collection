@@ -61,6 +61,22 @@ def get_ist_time():
     ist = pytz.timezone('Asia/Kolkata')
     return datetime.now(ist)
 
+def to_ist_isoformat(dt):
+    """Convert datetime to IST timezone and return ISO format string"""
+    if dt is None:
+        return None
+    
+    ist = pytz.timezone('Asia/Kolkata')
+    
+    # If datetime is timezone-naive, assume it's already in IST
+    if dt.tzinfo is None:
+        dt = ist.localize(dt)
+    # If datetime has a different timezone, convert to IST
+    elif dt.tzinfo != ist:
+        dt = dt.astimezone(ist)
+    
+    return dt.isoformat()
+
 # Redis connection for SSE
 redis_client = None
 
@@ -706,9 +722,9 @@ async def recent_alerts(limit: int = 100, hotel_id: Optional[str] = None):
         alert["roomId"] = alert.get("roomId") or alert.get("room_id", "Unknown")
         logger.info(f"  Alert {alert['id'][:8]}: deviceId={alert['deviceId']}, roomId={alert['roomId']}, type={alert.get('type')}")
         if alert.get("ts"):
-            alert["ts"] = alert["ts"].isoformat()
+            alert["ts"] = to_ist_isoformat(alert["ts"])
         if alert.get("acknowledged_at"):
-            alert["acknowledged_at"] = alert["acknowledged_at"].isoformat()
+            alert["acknowledged_at"] = to_ist_isoformat(alert["acknowledged_at"])
     
     return alerts
 
@@ -738,7 +754,7 @@ async def list_devices(hotel_id: Optional[str] = None):
         "batteryLevel": d.get("battery"),
         "rssi": d.get("rssi"),
         "ip": d.get("ip"),
-        "lastSeen": d["last_seen"].isoformat() if d.get("last_seen") else None
+        "lastSeen": to_ist_isoformat(d.get("last_seen"))
     } for d in devices]
 
 # Delete device (Owner only)
