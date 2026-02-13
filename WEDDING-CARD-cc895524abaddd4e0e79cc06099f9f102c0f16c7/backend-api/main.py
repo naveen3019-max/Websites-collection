@@ -57,9 +57,14 @@ app.add_middleware(
 
 # Helper function for Indian Standard Time
 def get_ist_time():
-    """Get current time in Indian Standard Time"""
+    """Get current time in Indian Standard Time (properly converted from UTC)"""
+    # Get current UTC time (Render servers use UTC)
+    utc_now = datetime.utcnow()
+    # Make it timezone-aware (UTC)
+    utc_now = pytz.utc.localize(utc_now)
+    # Convert to IST (UTC+5:30)
     ist = pytz.timezone('Asia/Kolkata')
-    return datetime.now(ist)
+    return utc_now.astimezone(ist)
 
 def to_ist_isoformat(dt):
     """Convert datetime to IST timezone and return ISO format string"""
