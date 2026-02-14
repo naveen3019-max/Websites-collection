@@ -73,9 +73,12 @@ def to_ist_isoformat(dt):
     
     ist = pytz.timezone('Asia/Kolkata')
     
-    # If datetime is timezone-naive, assume it's already in IST
+    # If datetime is timezone-naive, it's from MongoDB which stores UTC as naive
     if dt.tzinfo is None:
-        dt = ist.localize(dt)
+        # MongoDB stores UTC timestamps as naive datetimes - convert properly!
+        utc = pytz.timezone('UTC')
+        dt = utc.localize(dt)  # Label as UTC first
+        dt = dt.astimezone(ist)  # Then convert UTC → IST (+5:30)
     # If datetime has a different timezone, convert to IST
     elif dt.tzinfo != ist:
         dt = dt.astimezone(ist)
