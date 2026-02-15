@@ -38,32 +38,47 @@ class ScreenStateReceiver : BroadcastReceiver() {
         /**
          * Check if WiFi breach should be ignored
          * 
-         * NEW LOGIC:
-         * 1. Screen OFF → ALWAYS ignore (indefinitely, no time limit)
-         * 2. Screen ON + within grace period → Ignore (WiFi needs time to reconnect)
-         * 3. Screen ON + grace expired → Allow breach detection
+         * UPDATED LOGIC (Monitor WiFi even during screen OFF):
+         * 1. Screen OFF + within 3 min grace → Ignore (Android delayed WiFi disconnect)
+         * 2. Screen OFF + grace expired → ALLOW breach detection (tablet might be stolen)
+         * 3. Screen ON + within 3 min grace → Ignore (WiFi reconnecting)
+         * 4. Screen ON + grace expired → Allow breach detection
          * 
-         * This ensures NO false breaches while screen is OFF (auto-timeout or manual lock),
-         * regardless of how long screen stays OFF
+         * This monitors WiFi even when screen is OFF, but allows grace period for:
+         * - Android 10+ delayed WiFi disconnect (1-2 minutes after screen off)
+         * - WiFi reconnection when screen turns back on
          */
         fun shouldIgnoreWiFiBreach(): Boolean {
-            // Screen OFF → NEVER show breach (indefinite, no matter how long)
-            if (!isScreenOn) {
-                Log.d("ScreenState", "✅ Screen OFF - ignoring WiFi breach (indefinite)")
-                return true
+            val now = System.currentTimeMillis()
+            
+            // Check grace period based on most recent screen state change
+            if (!isScreenOn && screenOffTime > 0) {
+                // Screen is OFF - check grace period from when it turned off
+                val timeSinceScreenOff = now - screenOffTime
+                if (timeSinceScreenOff < SCREEN_ON_GRACE_PERIOD_MS) {
+                    val secsLeft = (SCREEN_ON_GRACE_PERIOD_MS - timeSinceScreenOff) / 1000
+                    Log.d("ScreenState", "⏳ Screen OFF grace: $secsLeft secs remaining (delayed WiFi disconnect)")
+                    return true
+                }
+                // Grace expired - monitor WiFi even during screen OFF
+                Log.d("ScreenState", "⚠️ Screen OFF + grace expired - WiFi monitoring ACTIVE (theft detection)")
+                return false
             }
             
-            // Screen ON → Check grace period (starts when screen turns ON)
-            if (screenOnTime > 0) {
-                val timeSinceScreenOn = System.currentTimeMillis() - screenOnTime
+            if (isScreenOn && screenOnTime > 0) {
+                // Screen is ON - check grace period from when it turned on
+                val timeSinceScreenOn = now - screenOnTime
                 if (timeSinceScreenOn < SCREEN_ON_GRACE_PERIOD_MS) {
                     val secsLeft = (SCREEN_ON_GRACE_PERIOD_MS - timeSinceScreenOn) / 1000
                     Log.d("ScreenState", "⏳ Screen ON grace: $secsLeft secs remaining (WiFi reconnecting)")
                     return true
                 }
+                // Grace expired - monitor WiFi normally
+                Log.d("ScreenState", "⚠️ Screen ON + grace expired - WiFi monitoring ACTIVE")
+                return false
             }
             
-            Log.d("ScreenState", "⚠️ Screen ON + grace expired - WiFi monitoring ACTIVE")
+            // No grace period active - monitor WiFi
             return false
         }
         
