@@ -38,38 +38,18 @@ class ScreenStateReceiver : BroadcastReceiver() {
         /**
          * Check if WiFi breach should be ignored
          * 
-         * FINAL LOGIC: Prevent false breaches from Android's automatic WiFi disconnect
+         * WIFI LOCK SOLUTION:
+         * - WiFi Lock keeps WiFi connected even when screen turns OFF
+         * - No grace period needed - WiFi won't disconnect during sleep
+         * - Monitors WiFi 24/7 regardless of screen state
+         * - True breaches detected immediately
          * 
-         * When screen turns OFF:
-         * - Android disconnects WiFi after 1-2 minutes (power-saving)
-         * - This is NOT a security breach - just normal power management
-         * - Grace period: Ignore WiFi disconnects for 5 minutes after screen OFF
-         * 
-         * When screen turns ON:
-         * - No grace period needed
-         * - WiFi should be connected
-         * - Immediate breach detection if WiFi is off
-         * 
-         * This prevents false alarms during screen timeout while still detecting real theft.
+         * This enables real-time breach detection even when screen is OFF.
          */
         fun shouldIgnoreWiFiBreach(): Boolean {
-            // Only apply grace period when screen is OFF
-            if (!isScreenOn && screenOffTime > 0) {
-                val timeSinceScreenOff = System.currentTimeMillis() - screenOffTime
-                // Grace period: 5 minutes (300 seconds) to cover Android's delayed WiFi disconnect
-                val SCREEN_OFF_GRACE_MS = 300_000L
-                
-                if (timeSinceScreenOff < SCREEN_OFF_GRACE_MS) {
-                    val secsLeft = (SCREEN_OFF_GRACE_MS - timeSinceScreenOff) / 1000
-                    Log.d("ScreenState", "⏳ Screen OFF grace: $secsLeft secs remaining (ignoring Android WiFi disconnect)")
-                    return true
-                } else {
-                    Log.d("ScreenState", "⚠️ Screen OFF for ${timeSinceScreenOff/1000}s - WiFi monitoring active")
-                }
-            } else {
-                Log.d("ScreenState", "✅ Screen ON - WiFi monitoring active (no grace period)")
-            }
-            
+            // No grace period - WiFi Lock keeps connection alive
+            // Monitor WiFi 24/7 regardless of screen state
+            Log.d("ScreenState", "✅ WiFi monitoring ACTIVE 24/7 (WiFi Lock prevents disconnect)")
             return false
         }
         

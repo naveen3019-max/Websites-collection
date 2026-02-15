@@ -41,6 +41,7 @@ class KioskService : Service() {
     private var screenStateReceiver: ScreenStateReceiver? = null
     private var breachOverlayView: View? = null
     private var windowManager: WindowManager? = null
+    private var wifiLock: WifiManager.WifiLock? = null
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var isRunning = false
@@ -53,6 +54,12 @@ class KioskService : Service() {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
+        
+        // Acquire WiFi lock to keep WiFi connected even when screen turns OFF
+        val wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        wifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "HotelSecurityWifiLock")
+        wifiLock?.acquire()
+        Log.i("KioskService", "🔒 WiFi Lock acquired - WiFi will stay connected during screen OFF")
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Hotel Security Active")
@@ -514,6 +521,14 @@ class KioskService : Service() {
         serviceScope.cancel()
         wifiFence.stop()
         batteryWatcher.stop()
+        
+        // Release WiFi lock
+        wifiLock?.let {
+            if (it.isHeld) {
+                it.release()
+                Log.i("KioskService", "🔓 WiFi Lock released")
+            }
+        }
         
         // Remove breach overlay if showing
         dismissBreachOverlay()
