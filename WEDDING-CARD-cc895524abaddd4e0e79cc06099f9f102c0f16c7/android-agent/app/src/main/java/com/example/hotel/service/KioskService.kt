@@ -108,7 +108,13 @@ class KioskService : Service() {
             val roomId = prefs.getString("room_id", "UNKNOWN")!!
             val bssid = prefs.getString("bssid", "AA:BB:CC:DD:EE:FF")!!
             val ssid = prefs.getString("ssid", null)
-            val minRssi = prefs.getInt("minRssi", -70)
+            
+            // CRITICAL FIX: Detect unconfigured room (default BSSID) and use permissive threshold
+            // When no room config exists, only detect complete WiFi loss, not weak signal
+            val isRoomConfigured = bssid != "AA:BB:CC:DD:EE:FF"
+            val defaultMinRssi = if (isRoomConfigured) -70 else -90  // Permissive threshold for unconfigured rooms
+            val minRssi = prefs.getInt("minRssi", defaultMinRssi)
+            
             val backendUrl = prefs.getString("backend_url", "NOT_SET")
             
             Log.i("KioskService", "📱 Device Configuration:")
@@ -117,7 +123,8 @@ class KioskService : Service() {
             Log.i("KioskService", "   Backend URL: '$backendUrl'")
             Log.i("KioskService", "   SSID: '$ssid'")
             Log.i("KioskService", "   BSSID: '$bssid'")
-            Log.i("KioskService", "   Min RSSI: $minRssi dBm")
+            Log.i("KioskService", "   Room Configured: $isRoomConfigured")
+            Log.i("KioskService", "   Min RSSI: $minRssi dBm ${if (!isRoomConfigured) "(PERMISSIVE - no room config)" else ""}")
             
             val auth = prefs.getString("jwt_token", null)?.let { "Bearer $it" }
             Log.i("KioskService", "   JWT Token: ${if (auth != null) "Present (${auth.length} chars)" else "❌ MISSING!"}")
