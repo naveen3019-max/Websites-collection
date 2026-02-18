@@ -5,9 +5,9 @@ import { Instagram, Heart, MessageCircle } from 'lucide-react';
 const feeds = [
     { url: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=400&q=80", likes: "1.2k" },
     { url: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=400&q=80", likes: "980" },
-    { url: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=400&q=80", likes: "2.4k" },
-    { url: "https://images.unsplash.com/photo-1559925373-2f82136b674b?auto=format&fit=crop&w=400&q=80", likes: "1.5k" },
-    { url: "https://images.unsplash.com/photo-1525610553991-2bede1a233e9?auto=format&fit=crop&w=400&q=80", likes: "1.1k" },
+    { url: "https://th.bing.com/th?q=Cafe+Latte+Art&w=120&h=120&c=1&rs=1&qlt=70&o=7&cb=1&dpr=1.3&pid=InlineBlock&rm=3&mkt=en-IN&cc=IN&setlang=en&adlt=moderate&t=1&mw=247", likes: "2.4k" },
+    { url: "https://th.bing.com/th/id/OIP.o1AKR6nNP0bgYUP7RPJS8AHaHa?w=245&h=184&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3", likes: "1.5k" },
+    { url: "https://th.bing.com/th/id/OIP.6llyO2V8YRWaygkfAti_9QHaE8?w=276&h=184&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3", likes: "1.1k" },
     { url: "https://images.unsplash.com/photo-1517717449034-3daa5f452ce5?auto=format&fit=crop&w=400&q=80", likes: "3.2k" }
 ];
 
