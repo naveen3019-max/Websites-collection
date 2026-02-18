@@ -31,8 +31,8 @@ const About: React.FC = () => {
 
                 <div className="relative z-10 text-center px-4 max-w-4xl">
                     <motion.span
-                        initial={{ opacity: 0, tracking: "0em" }}
-                        animate={{ opacity: 1, tracking: "0.5em" }}
+                        initial={{ opacity: 0, letterSpacing: "0em" }}
+                        animate={{ opacity: 1, letterSpacing: "0.5em" }}
                         className="text-primary font-bold uppercase mb-6 inline-block"
                     >
                         Established 2010
