@@ -65,7 +65,7 @@ const HeirloomCare = () => {
                 <div className="relative">
                     <div className="aspect-[4/5] bg-pearl/5 border border-gold/10 relative overflow-hidden group">
                         <img
-                            src="/src/assets/silk-saree-1.jpg"
+                            src="/images/silk-saree-1.jpg"
                             alt="Saree Care"
                             className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-[2s]"
                         />

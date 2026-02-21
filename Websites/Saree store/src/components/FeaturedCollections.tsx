@@ -18,7 +18,7 @@ const FeaturedCollections = () => {
             id: 1,
             title: 'Timeless Banarasi',
             price: '₹24,999',
-            image: '/src/assets/silk-saree-1.jpg',
+            image: '/images/silk-saree-1.jpg',
             tag: 'Heritage',
             description: 'Handwoven pure silk featuring intricate gold zari work and traditional motifs.'
         },
@@ -26,7 +26,7 @@ const FeaturedCollections = () => {
             id: 2,
             title: 'Royal Kanchipuram',
             price: '₹32,000',
-            image: '/src/assets/silk-saree-2.jpg',
+            image: '/images/silk-saree-2.jpg',
             tag: 'Royal',
             description: 'The "Queen of Silks" with contrasting borders and authentic temple weave patterns.'
         },
@@ -34,7 +34,7 @@ const FeaturedCollections = () => {
             id: 3,
             title: 'Handloom Prints',
             price: '₹8,499',
-            image: '/src/assets/printed-saree-1.jpg',
+            image: '/images/printed-saree-1.jpg',
             tag: 'Artisanal',
             description: 'Breathable hand-block prints on premium cotton-silk blends for everyday elegance.'
         },
@@ -42,7 +42,7 @@ const FeaturedCollections = () => {
             id: 4,
             title: 'Multicolor Edit',
             price: '₹14,500',
-            image: '/src/assets/printed-saree-2.jpg',
+            image: '/images/printed-saree-2.jpg',
             tag: 'Designer',
             description: 'A vibrant symphony of contemporary colors in a hand-crafted designer print.'
         },
@@ -50,7 +50,7 @@ const FeaturedCollections = () => {
             id: 5,
             title: 'Butterfly Silk Haute',
             price: '₹28,500',
-            image: '/src/assets/butterfly-silk.jpg',
+            image: '/images/butterfly-silk.jpg',
             tag: 'Exclusive',
             description: 'Exquisite silk featuring hand-applied butterfly motifs on a deep plum canvas.'
         },
@@ -58,7 +58,7 @@ const FeaturedCollections = () => {
             id: 6,
             title: 'Fuschia Elegance',
             price: '₹26,000',
-            image: '/src/assets/pink-silk-saree.jpg',
+            image: '/images/pink-silk-saree.jpg',
             tag: 'New Entry',
             description: 'A striking fuschia silk drape with a prestigious dark green border and gold highlights.'
         },
@@ -66,7 +66,7 @@ const FeaturedCollections = () => {
             id: 7,
             title: 'Maroon Floral Story',
             price: '₹12,499',
-            image: '/src/assets/maroon-floral-saree.jpg',
+            image: '/images/maroon-floral-saree.jpg',
             tag: 'Artisanal',
             description: 'Graceful floral narratives hand-printed on rich maroon silk-crepe fabric.'
         },
@@ -74,7 +74,7 @@ const FeaturedCollections = () => {
             id: 8,
             title: 'Midnight Azure Silk',
             price: '₹34,000',
-            image: '/src/assets/purple-silk-saree.jpg',
+            image: '/images/purple-silk-saree.jpg',
             tag: 'Royal',
             description: 'Prestigious purple silk paired with a vibrant azure blue pallu, featuring traditional zari artistry.'
         },

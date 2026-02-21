@@ -23,7 +23,7 @@ const AboutStore = () => {
                     >
                         <div className="aspect-[4/5] overflow-hidden bg-maroon border border-gold/20 shadow-2xl">
                             <img
-                                src="/src/assets/store-interior.jpg"
+                                src="/images/store-interior.jpg"
                                 alt="Authentic RS Handlooms Interior"
                                 className="w-full h-full object-cover opacity-90"
                             />
@@ -39,7 +39,7 @@ const AboutStore = () => {
                     >
                         <div className="aspect-square overflow-hidden bg-maroon border border-gold/10">
                             <img
-                                src="/src/assets/shopping-experience.jpg"
+                                src="/images/shopping-experience.jpg"
                                 alt="Personalized Saree Shopping Experience"
                                 className="w-full h-full object-cover opacity-90"
                             />

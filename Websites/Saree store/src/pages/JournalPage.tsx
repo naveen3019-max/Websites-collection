@@ -9,7 +9,7 @@ const JournalPage = () => {
             title: 'The Art of the Antique Zari',
             category: 'Craftsmanship',
             excerpt: 'How our weavers restore gold-thread techniques from the 18th century for modern bridal heirlooms.',
-            image: '/src/assets/silk-saree-1.jpg'
+            image: '/images/silk-saree-1.jpg'
         },
         {
             id: 2,
@@ -17,7 +17,7 @@ const JournalPage = () => {
             title: 'Draping as Identity',
             category: 'Styling',
             excerpt: 'Exploring the intersection of tradition and personal expression through the five-yard drape.',
-            image: '/src/assets/shopping-experience.jpg'
+            image: '/images/shopping-experience.jpg'
         },
         {
             id: 3,
@@ -25,7 +25,7 @@ const JournalPage = () => {
             title: 'Sustainable Silks',
             category: 'Heritage',
             excerpt: 'Our commitment to organic dyes and ethical weaving clusters in the heart of South India.',
-            image: '/src/assets/store-interior.jpg'
+            image: '/images/store-interior.jpg'
         },
         {
             id: 4,
@@ -33,7 +33,7 @@ const JournalPage = () => {
             title: 'The Indigo Revival',
             category: 'Technique',
             excerpt: 'Rediscovering the deep Soul of Blue through ancient vat-dyeing processes in Rajasthan.',
-            image: '/src/assets/silk-saree-2.jpg'
+            image: '/images/silk-saree-2.jpg'
         },
         {
             id: 5,
@@ -41,7 +41,7 @@ const JournalPage = () => {
             title: 'Heirloom Preservation',
             category: 'Care',
             excerpt: 'A masterclass on maintaining the luster of pure Zari and silk for generations to come.',
-            image: '/src/assets/maroon-floral-saree.jpg'
+            image: '/images/maroon-floral-saree.jpg'
         },
         {
             id: 6,
@@ -49,7 +49,7 @@ const JournalPage = () => {
             title: 'Modern Draping Artistry',
             category: 'Styling',
             excerpt: 'Transitioning the traditional 6-yard drape into contemporary evening-wear silhouettes.',
-            image: '/src/assets/butterfly-silk.jpg'
+            image: '/images/butterfly-silk.jpg'
         }
     ];
 
@@ -80,7 +80,7 @@ const JournalPage = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center py-20 border-b border-gold/10">
                     <div className="relative">
                         <div className="aspect-[16/10] bg-maroon overflow-hidden border border-gold/20 shadow-2xl">
-                            <img src="/src/assets/silk-saree-1.jpg" alt="Featured Narrative" className="w-full h-full object-cover opacity-90" />
+                            <img src="/images/silk-saree-1.jpg" alt="Featured Narrative" className="w-full h-full object-cover opacity-90" />
                         </div>
                         <div className="absolute -bottom-8 -right-8 bg-pearl border border-gold/10 p-8 hidden xl:block shadow-2xl z-20">
                             <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-gold mb-2">March 2026 Issue</p>

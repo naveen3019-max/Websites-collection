@@ -93,7 +93,7 @@ const BespokePage = () => {
                             ))}
                         </div>
                         <div className="bg-maroon p-1 relative overflow-hidden group">
-                            <img src="/src/assets/hero-saree.jpg" alt="Textile Macro Detail" className="w-full h-full object-cover opacity-80 grayscale group-hover:grayscale-0 transition-all duration-1000" />
+                            <img src="/images/hero-saree.jpg" alt="Textile Macro Detail" className="w-full h-full object-cover opacity-80 grayscale group-hover:grayscale-0 transition-all duration-1000" />
                             <div className="absolute inset-0 border border-gold/20 m-6" />
                         </div>
                     </div>
@@ -104,7 +104,7 @@ const BespokePage = () => {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
                         <div className="relative order-2 lg:order-1">
                             <div className="aspect-square bg-white border border-gold/20 p-8 shadow-2xl relative z-10">
-                                <img src="/src/assets/silk-saree-2.jpg" alt="Institutional Gifting" className="w-full h-full object-cover opacity-90" />
+                                <img src="/images/silk-saree-2.jpg" alt="Institutional Gifting" className="w-full h-full object-cover opacity-90" />
                             </div>
                             <div className="absolute -top-10 -left-10 w-64 h-64 bg-maroon/5 rounded-full blur-3xl" />
                         </div>

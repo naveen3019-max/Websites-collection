@@ -87,7 +87,7 @@ const Hero = () => {
                 >
                     <div className="relative z-10 overflow-hidden aspect-[3/4] md:h-[750px] bg-maroon border border-gold/10 shadow-2xl">
                         <img
-                            src="/src/assets/hero-saree.jpg"
+                            src="/images/hero-saree.jpg"
                             alt="Authentic Editorial Saree Showcase"
                             className="w-full h-full object-cover transition-transform duration-[2s] scale-105 group-hover:scale-110 opacity-80"
                         />

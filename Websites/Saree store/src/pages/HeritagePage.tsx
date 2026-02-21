@@ -34,7 +34,7 @@ const HeritagePage = () => {
                         viewport={{ once: true }}
                         className="aspect-[4/5] bg-maroon relative group"
                     >
-                        <img src="/src/assets/store-interior.jpg" alt="Traditional Loom" className="w-full h-full object-cover opacity-80" />
+                        <img src="/images/store-interior.jpg" alt="Traditional Loom" className="w-full h-full object-cover opacity-80" />
                         <div className="absolute inset-0 border-[20px] border-pearl/10 m-8" />
                     </motion.div>
                     <div className="space-y-10">
@@ -83,7 +83,7 @@ const HeritagePage = () => {
                         viewport={{ once: true }}
                         className="aspect-[3/4] bg-maroon order-1 lg:order-2"
                     >
-                        <img src="/src/assets/shopping-experience.jpg" alt="Thread Mastery" className="w-full h-full object-cover opacity-80" />
+                        <img src="/images/shopping-experience.jpg" alt="Thread Mastery" className="w-full h-full object-cover opacity-80" />
                     </motion.div>
                 </div>
 
@@ -105,7 +105,7 @@ const HeritagePage = () => {
                             </div>
                         </div>
                         <div className="relative aspect-[16/9] bg-white/5 border border-gold/10 overflow-hidden">
-                            <img src="/src/assets/hero-saree.jpg" alt="Global Showcase" className="w-full h-full object-cover opacity-60" />
+                            <img src="/images/hero-saree.jpg" alt="Global Showcase" className="w-full h-full object-cover opacity-60" />
                             <div className="absolute inset-0 bg-maroon/20" />
                         </div>
                     </div>
