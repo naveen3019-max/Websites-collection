@@ -1,0 +1,109 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:wght@100..900&family=Poppins:wght@100..900&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --color-pearl: #FCFAF7;
+  --color-pearl-light: #FFFFFF;
+  --color-pearl-dark: #F3F0E9;
+  --color-maroon: #4A0E0E;
+  --color-maroon-light: #631313;
+  --color-maroon-dark: #310909;
+  --color-gold: #C5A059;
+  --color-gold-light: #D4B982;
+  --color-gold-dark: #A6833D;
+  --color-ink: #1A1A1A;
+
+  --font-playfair: "Playfair Display", serif;
+  --font-inter: "Inter", sans-serif;
+  --font-poppins: "Poppins", sans-serif;
+
+  --animate-fade-in: fadeIn 0.5s ease-out forwards;
+  --animate-slide-up: slideUp 0.5s ease-out forwards;
+
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    0% {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+}
+
+@layer base {
+  :root {
+    --background: #FCFAF7;
+    --foreground: #1A1A1A;
+    --primary: #4A0E0E;
+    --primary-foreground: #FCFAF7;
+    --secondary: #F3F0E9;
+    --secondary-foreground: #1A1A1A;
+    --accent: #C5A059;
+    --accent-foreground: #1A1A1A;
+    --border: #C5A059;
+  }
+
+  * {
+    @apply border-gold/20;
+  }
+
+  body {
+    @apply bg-pearl text-ink font-inter antialiased;
+    margin: 0;
+    min-height: 100vh;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-playfair tracking-tight;
+  }
+}
+
+@layer components {
+  .btn-premium {
+    @apply px-8 py-3 bg-maroon text-pearl font-medium transition-all duration-500 hover:bg-maroon-light hover:shadow-2xl hover:shadow-maroon/20 active:scale-95 disabled:opacity-50 disabled:pointer-events-none tracking-widest uppercase text-[10px] font-bold border border-gold/20;
+  }
+
+  .btn-gold {
+    @apply px-8 py-3 bg-gold text-maroon font-inter font-bold transition-all duration-500 hover:bg-gold-light hover:shadow-2xl hover:shadow-gold/30 active:scale-95 tracking-widest uppercase text-[10px];
+  }
+
+  .text-gold-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-gold-dark via-gold to-gold-light;
+  }
+
+  .heritage-card {
+    @apply bg-white border border-gold/10 shadow-[0_15px_40px_-15px_rgba(197, 160, 89, 0.1)] transition-all duration-500;
+  }
+
+  .editorial-spacing {
+    @apply tracking-[0.05em] leading-[1.8];
+  }
+}
+
+.saree-card-hover {
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.saree-card-hover:hover {
+  transform: translateY(-12px);
+  box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.15);
+}
