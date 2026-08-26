@@ -1,0 +1,149 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Base ──────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  @apply font-sans bg-teal-950 text-cream-100;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Scroll-reveal utility ─────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.75s ease, transform 0.75s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-32px);
+  transition: opacity 0.75s ease, transform 0.75s ease;
+}
+.reveal-left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+.reveal-right {
+  opacity: 0;
+  transform: translateX(32px);
+  transition: opacity 0.75s ease, transform 0.75s ease;
+}
+.reveal-right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ─── Divider wave ──────────────────────────────────── */
+.wave-divider svg { display: block; }
+
+/* ─── Nav glassmorphism ──────────────────────────────── */
+.nav-glass {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(14, 75, 67, 0.85);
+  border-bottom: 1px solid rgba(201, 151, 59, 0.15);
+}
+
+/* ─── Gold shimmer on headings ──────────────────────── */
+.gold-shimmer {
+  background: linear-gradient(90deg, #C9973B 0%, #e8c07a 50%, #C9973B 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s linear infinite;
+}
+@keyframes shimmer {
+  to { background-position: 200% center; }
+}
+
+/* ─── Section divider line ──────────────────────────── */
+.section-tag {
+  @apply inline-flex items-center gap-2 text-xs font-sans font-semibold tracking-[0.2em] uppercase text-gold-400;
+}
+.section-tag::before, .section-tag::after {
+  content: '';
+  display: block;
+  width: 32px;
+  height: 1px;
+  background: #C9973B;
+  opacity: 0.6;
+}
+
+/* ─── Menu tab active ───────────────────────────────── */
+.menu-tab-active {
+  @apply bg-gold-500 text-teal-950;
+}
+.menu-tab-inactive {
+  @apply bg-transparent text-gold-400 border border-gold-500/30 hover:border-gold-500 hover:text-gold-300;
+}
+
+/* ─── Card hover lift ───────────────────────────────── */
+.card-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(201,151,59,0.12);
+}
+
+/* ─── Floating WhatsApp button pulse ─────────────────── */
+@keyframes wa-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.5); }
+  50%       { box-shadow: 0 0 0 10px rgba(37, 211, 102, 0); }
+}
+.wa-pulse { animation: wa-pulse 2s ease-in-out infinite; }
+
+/* ─── Swiggy button ──────────────────────────────────── */
+.swiggy-btn {
+  @apply inline-flex items-center gap-2 font-sans font-semibold text-white rounded-full px-5 py-2.5 transition-all duration-200;
+  background: #FC8019;
+}
+.swiggy-btn:hover {
+  background: #e06b0e;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(252, 128, 25, 0.35);
+}
+
+/* ─── Gallery grid ───────────────────────────────────── */
+.gallery-img {
+  transition: transform 0.45s ease, filter 0.45s ease;
+}
+.gallery-img:hover {
+  transform: scale(1.04);
+  filter: brightness(1.1);
+}
+
+/* ─── Review card stars ──────────────────────────────── */
+.star-filled  { color: #C9973B; }
+.star-empty   { color: #2d5a52; }
+
+/* ─── Form inputs ───────────────────────────────────── */
+.form-input {
+  @apply w-full rounded-xl bg-teal-900/60 border border-gold-500/20 text-cream-100 px-4 py-3 font-sans text-sm outline-none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-input:focus {
+  border-color: #C9973B;
+  box-shadow: 0 0 0 3px rgba(201,151,59,0.15);
+}
+.form-input::placeholder { color: rgba(245,239,224,0.4); }
+
+/* ─── Scrollbar ─────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #051f1c; }
+::-webkit-scrollbar-thumb { background: #C9973B; border-radius: 3px; }
+
+/* ─── Focus visible ─────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid #C9973B;
+  outline-offset: 2px;
+}
