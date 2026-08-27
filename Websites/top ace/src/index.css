@@ -1,0 +1,225 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #FBF3E7;
+    color: #1a0d15;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+  }
+}
+
+@layer utilities {
+  .text-gradient-coral {
+    background: linear-gradient(135deg, #E8613C, #F4A261);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-plum {
+    background: linear-gradient(135deg, #4A1E3A, #6B2E57);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .bg-plum-gradient {
+    background: linear-gradient(135deg, #2E1024 0%, #4A1E3A 50%, #3D1830 100%);
+  }
+
+  .bg-coral-gradient {
+    background: linear-gradient(135deg, #E8613C, #F07A59);
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  .glass-card-light {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #2E1024;
+}
+::-webkit-scrollbar-thumb {
+  background: #E8613C;
+  border-radius: 3px;
+}
+
+/* Focus styles for accessibility */
+*:focus-visible {
+  outline: 2px solid #E8613C;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Intersection Observer animations */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal-left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-right {
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal-right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Stagger delays */
+.delay-100 { transition-delay: 0.1s; }
+.delay-200 { transition-delay: 0.2s; }
+.delay-300 { transition-delay: 0.3s; }
+.delay-400 { transition-delay: 0.4s; }
+.delay-500 { transition-delay: 0.5s; }
+
+/* Hero gradient overlay */
+.hero-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(46, 16, 36, 0.82) 0%,
+    rgba(74, 30, 58, 0.65) 40%,
+    rgba(74, 30, 58, 0.85) 75%,
+    rgba(46, 16, 36, 0.97) 100%
+  );
+}
+
+/* Shimmer loading for gallery tiles */
+.gallery-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.05) 0%,
+    rgba(255,255,255,0.15) 50%,
+    rgba(255,255,255,0.05) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+/* Tab indicator */
+.tab-active {
+  position: relative;
+}
+.tab-active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #E8613C, #F4A261);
+  border-radius: 2px 2px 0 0;
+}
+
+/* Floating action bar */
+.mobile-fab {
+  backdrop-filter: blur(20px);
+  background: rgba(46, 16, 36, 0.92);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Badge pulse */
+.badge-pulse {
+  animation: badgePulse 2s ease-in-out infinite;
+}
+@keyframes badgePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* Nav glass */
+.nav-glass {
+  background: rgba(46, 16, 36, 0.9);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(232, 97, 60, 0.2);
+}
+
+/* Menu card hover */
+.menu-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.menu-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(232, 97, 60, 0.15);
+}
+
+/* Review card */
+.review-card {
+  transition: transform 0.2s ease;
+}
+.review-card:hover {
+  transform: translateY(-4px);
+}
+
+/* Veg dot */
+.veg-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #16a34a;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.veg-badge-square {
+  border: 2px solid #16a34a;
+  border-radius: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
