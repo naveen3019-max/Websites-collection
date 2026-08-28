@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+@theme {
+  --color-base: #1A1613;
+  --color-primary: #D9A24B;
+  --color-secondary: #5C1F2E;
+  --color-cream: #F2E6D3;
+  --color-swiggy: #FC8019;
+  --color-whatsapp: #25D366;
+  --font-serif: "Playfair Display", serif;
+  --font-sans: "Inter", sans-serif;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-base);
+    color: var(--color-cream);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif);
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@utility pattern-bg {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l30 30-30 30L0 30z' fill='%23D9A24B' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+}
+
+@utility glass-nav {
+  background-color: rgba(26, 22, 19, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(217, 162, 75, 0.1);
+}
+
+@utility glass-card {
+  background-color: rgba(26, 22, 19, 0.5);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(217, 162, 75, 0.2);
+  border-radius: 0.75rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@utility animate-fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+@utility animate-fade-in-delayed {
+  animation: fadeIn 0.8s ease-out 0.3s forwards;
+  opacity: 0;
+}
