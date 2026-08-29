@@ -1,0 +1,31 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+@layer base {
+  body {
+    font-family: theme('fontFamily.body');
+    background-color: theme('colors.bamey.cream');
+    color: theme('colors.gray.900');
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: theme('fontFamily.display');
+  }
+}
+
+.prayer-flags-divider {
+  height: 6px;
+  background: linear-gradient(
+    to right,
+    #1E3A8A 0%, #1E3A8A 20%,  /* Blue */
+    #FFFFFF 20%, #FFFFFF 40%, /* White */
+    #DC2626 40%, #DC2626 60%, /* Red */
+    #16A34A 60%, #16A34A 80%, /* Green */
+    #FACC15 80%, #FACC15 100% /* Yellow */
+  );
+  opacity: 0.8;
+}
+
+.momo-challenge-bg {
+  background: linear-gradient(135deg, #B23A2E 0%, #8b2319 100%);
+}
