@@ -7,11 +7,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        bamey: {
-          red: '#B23A2E',
-          orange: '#E08A2C',
-          green: '#3A5A40',
-          cream: '#F5EDE0',
+        daawat: {
+          gold: '#D4AF37',
+          dark: '#111827',
+          crimson: '#8B0000',
+          amber: '#FFBF00',
         }
       },
       fontFamily: {
