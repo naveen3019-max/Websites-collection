@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-bistro-cream text-gray-900 font-body antialiased selection:bg-bistro-gold selection:text-white;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading text-bistro-red;
+  }
+}
+
+@layer utilities {
+  .folk-border {
+    @apply border-t-2 border-b-2 border-bistro-red border-dashed py-2 my-8;
+  }
+}
